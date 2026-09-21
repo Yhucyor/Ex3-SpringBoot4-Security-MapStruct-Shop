@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/layout :: head('Quản lý Users')}">
+    <title>Quản lý Users</title>
+</head>
+
+<body>
+
+<div th:replace="~{layouts/layout :: page(~{::main})}">
+
+    <main>
+
+        <h1>Quản lý Users</h1>
+
+        <!-- Thông báo thành công -->
+        <div class="alert success"
+             th:if="${success != null}"
+             th:text="${success}">
+            Thao tác thành công
+        </div>
+
+        <!-- Thanh tìm kiếm -->
+        <div class="toolbar">
+
+            <form th:action="@{/users}"
+                  method="get">
+
+                <input type="text"
+                       name="keyword"
+                       th:value="${keyword}"
+                       placeholder="Username, email, họ tên...">
+
+                <input type="hidden"
+                       name="size"
+                       th:value="${size}">
+
+                <button type="submit"
+                        class="button">
+                    Tìm kiếm
+                </button>
+
+                <a class="button secondary"
+                   th:href="@{/users}">
+                    Đặt lại
+                </a>
+
+            </form>
+
+            <a class="button"
+               th:href="@{/users/create}">
+                + Thêm User
+            </a>
+
+        </div>
+
+        <!-- Bảng User -->
+        <table>
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Họ tên</th>
+                <th>Role</th>
+                <th>Trạng thái</th>
+                <th>Số Product</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <!-- Danh sách User -->
+            <tr th:each="user : ${users.content}">
+
+                <td th:text="${user.id}">
+                    1
+                </td>
+
+                <td th:text="${user.username}">
+                    username
+                </td>
+
+                <td th:text="${user.email}">
+                    email@gmail.com
+                </td>
+
+                <td th:text="${user.fullName}">
+                    Nguyễn Văn A
+                </td>
+
+                <td th:text="${user.roleName}">
+                    ROLE_USER
+                </td>
+
+                <td>
+                    <span th:if="${user.enabled}"
+                          style="color: green;">
+                        ACTIVE
+                    </span>
+
+                    <span th:unless="${user.enabled}"
+                          style="color: red;">
+                        INACTIVE
+                    </span>
+                </td>
+
+                <td th:text="${user.productCount}">
+                    0
+                </td>
+
+                <td class="actions">
+
+                    <!-- Chỉnh sửa -->
+                    <a class="button secondary"
+                       th:href="@{/users/edit/{id}(id=${user.id})}">
+                        Edit
+                    </a>
+
+                    <!-- Xóa -->
+                    <form th:action="@{/users/delete/{id}(id=${user.id})}"
+                          method="post"
+                          onsubmit="return confirm('Bạn có chắc muốn xóa user này?');">
+
+                        <button type="submit"
+                                class="danger-link">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            <!-- Không có dữ liệu -->
+            <tr th:if="${users.empty}">
+                <td colspan="8">
+                    Không có dữ liệu user.
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+        <!-- Phân trang -->
+        <div class="pagination"
+             th:if="${users.totalPages > 0}">
+
+            <!-- Trang trước -->
+            <a th:if="${users.hasPrevious()}"
+               th:href="@{/users(
+                    page=${users.number - 1},
+                    size=${size},
+                    keyword=${keyword}
+               )}">
+                «
+            </a>
+
+            <!-- Danh sách số trang -->
+            <span th:each="pageNumber :
+                    ${#numbers.sequence(0, users.totalPages - 1)}">
+
+                <a th:href="@{/users(
+                        page=${pageNumber},
+                        size=${size},
+                        keyword=${keyword}
+                   )}"
+                   th:text="${pageNumber + 1}"
+                   th:classappend="${pageNumber == users.number}
+                        ? 'active'
+                        : ''">
+                    1
+                </a>
+
+            </span>
+
+            <!-- Trang sau -->
+            <a th:if="${users.hasNext()}"
+               th:href="@{/users(
+                    page=${users.number + 1},
+                    size=${size},
+                    keyword=${keyword}
+               )}">
+                »
+            </a>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

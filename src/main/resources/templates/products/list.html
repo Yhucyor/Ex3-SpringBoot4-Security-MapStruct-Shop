@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layouts/layout :: head('Quản lý Products')}">
+    <title>Quản lý Products</title>
+</head>
+
+<body>
+
+<div th:replace="~{layouts/layout :: page(~{::main})}">
+
+    <main>
+
+        <h1>Quản lý Products</h1>
+
+        <!-- Thông báo thành công -->
+        <div class="alert success"
+             th:if="${success != null}"
+             th:text="${success}">
+            Thao tác thành công
+        </div>
+
+        <!-- Thanh tìm kiếm -->
+        <div class="toolbar">
+
+            <form th:action="@{/products}"
+                  method="get">
+
+                <input type="text"
+                       name="keyword"
+                       th:value="${keyword}"
+                       placeholder="Tên sản phẩm, mô tả...">
+
+                <input type="hidden"
+                       name="size"
+                       th:value="${size}">
+
+                <button type="submit"
+                        class="button">
+                    Tìm kiếm
+                </button>
+
+                <a class="button secondary"
+                   th:href="@{/products}">
+                    Đặt lại
+                </a>
+
+            </form>
+
+            <a class="button"
+               th:href="@{/products/create}">
+                + Thêm Product
+            </a>
+
+        </div>
+
+        <!-- Bảng Product -->
+        <table>
+
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Mô tả</th>
+                <th>Giá</th>
+                <th>User</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <!-- Danh sách Product -->
+            <tr th:each="product : ${products.content}">
+
+                <td th:text="${product.id}">
+                    1
+                </td>
+
+                <!-- Ảnh -->
+                <td>
+
+                    <img class="thumb"
+                         th:if="${product.imageUrl != null
+                              and !#strings.isEmpty(product.imageUrl)}"
+                         th:src="${#strings.substringBefore(
+                              product.imageUrl,
+                              '|'
+                         )}"
+                         th:alt="${product.name}">
+
+                    <span th:unless="${product.imageUrl != null
+                                   and !#strings.isEmpty(product.imageUrl)}">
+                        Không có ảnh
+                    </span>
+
+                </td>
+
+                <!-- Tên -->
+                <td th:text="${product.name}">
+                    Tên sản phẩm
+                </td>
+
+                <!-- Mô tả -->
+                <td th:text="${product.description}">
+                    Mô tả sản phẩm
+                </td>
+
+                <!-- Giá -->
+                <td th:text="${#numbers.formatDecimal(
+                        product.price,
+                        0,
+                        'COMMA',
+                        2,
+                        'POINT'
+                    )}">
+                    0.00
+                </td>
+
+                <!-- User sở hữu -->
+                <td th:text="${product.username}">
+                    username
+                </td>
+
+                <!-- Thao tác -->
+                <td class="actions">
+
+                    <a class="button secondary"
+                       th:href="@{/products/edit/{id}(id=${product.id})}">
+                        Edit
+                    </a>
+
+                    <form th:action="@{/products/delete/{id}(id=${product.id})}"
+                          method="post"
+                          onsubmit="return confirm('Bạn có chắc muốn xóa product này?');">
+
+                        <button type="submit"
+                                class="danger-link">
+                            Delete
+                        </button>
+
+                    </form>
+
+                </td>
+
+            </tr>
+
+            <!-- Không có dữ liệu -->
+            <tr th:if="${#lists.isEmpty(products.content)}">
+                <td colspan="7">
+                    Không có dữ liệu product.
+                </td>
+            </tr>
+
+            </tbody>
+
+        </table>
+
+        <!-- Phân trang -->
+        <div class="pagination"
+             th:if="${products.totalPages > 0}">
+
+            <!-- Trang trước -->
+            <a th:if="${products.hasPrevious()}"
+               th:href="@{/products(
+                    page=${products.number - 1},
+                    size=${size},
+                    keyword=${keyword}
+               )}">
+                «
+            </a>
+
+            <!-- Danh sách số trang -->
+            <span th:each="pageNumber :
+                    ${#numbers.sequence(0, products.totalPages - 1)}">
+
+                <a th:href="@{/products(
+                        page=${pageNumber},
+                        size=${size},
+                        keyword=${keyword}
+                   )}"
+                   th:text="${pageNumber + 1}"
+                   th:classappend="${pageNumber == products.number}
+                        ? 'active'
+                        : ''">
+                    1
+                </a>
+
+            </span>
+
+            <!-- Trang sau -->
+            <a th:if="${products.hasNext()}"
+               th:href="@{/products(
+                    page=${products.number + 1},
+                    size=${size},
+                    keyword=${keyword}
+               )}">
+                »
+            </a>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>
