@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import thuc.ute.ex3springboot4securitymapstructshop.dto.ProductDTO;
+import thuc.ute.ex3springboot4securitymapstructshop.repository.CategoryRepository;
 import thuc.ute.ex3springboot4securitymapstructshop.security.CustomUserDetails;
 import thuc.ute.ex3springboot4securitymapstructshop.service.ProductService;
 
@@ -19,6 +20,7 @@ import thuc.ute.ex3springboot4securitymapstructshop.service.ProductService;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+    private final CategoryRepository categoryRepository;
 
     @GetMapping
     public String list(@RequestParam(defaultValue = "") String keyword,
@@ -34,6 +36,7 @@ public class ProductController {
     @GetMapping("/create")
     public String create(Model model) {
         model.addAttribute("productDTO", new ProductDTO());
+        model.addAttribute("categories", categoryRepository.findByEnabledTrueOrderByNameAsc());
         model.addAttribute("mode", "create");
         return "products/form";
     }
@@ -46,6 +49,7 @@ public class ProductController {
                          Model model,
                          RedirectAttributes redirect) {
         if (result.hasErrors()) {
+            model.addAttribute("categories", categoryRepository.findByEnabledTrueOrderByNameAsc());
             model.addAttribute("mode", "create");
             return "products/form";
         }
@@ -57,6 +61,7 @@ public class ProductController {
             return "redirect:/products";
         } catch (IllegalArgumentException e) {
             result.reject("product.error", e.getMessage());
+            model.addAttribute("categories", categoryRepository.findByEnabledTrueOrderByNameAsc());
             model.addAttribute("mode", "create");
             return "products/form";
         }
@@ -65,6 +70,7 @@ public class ProductController {
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
         model.addAttribute("productDTO", productService.findById(id));
+        model.addAttribute("categories", categoryRepository.findByEnabledTrueOrderByNameAsc());
         model.addAttribute("mode", "edit");
         return "products/form";
     }
@@ -77,6 +83,7 @@ public class ProductController {
                        Model model,
                        RedirectAttributes redirect) {
         if (result.hasErrors()) {
+            model.addAttribute("categories", categoryRepository.findByEnabledTrueOrderByNameAsc());
             model.addAttribute("mode", "edit");
             return "products/form";
         }

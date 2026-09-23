@@ -30,6 +30,7 @@ public class SecurityConfig {
                                 "/resend-register-otp", "/css/**", "/js/**"
                         ).permitAll()
                         .requestMatchers("/users/**").hasRole("ADMIN")
+                        .requestMatchers("/categories/**").authenticated()
                         .requestMatchers("/products/**").authenticated()
                         .anyRequest().authenticated()
                 )

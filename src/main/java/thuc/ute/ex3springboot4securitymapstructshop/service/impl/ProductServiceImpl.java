@@ -7,7 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import thuc.ute.ex3springboot4securitymapstructshop.dto.ProductDTO;
+import thuc.ute.ex3springboot4securitymapstructshop.repository.CategoryRepository;
 import thuc.ute.ex3springboot4securitymapstructshop.service.ProductService;
+import thuc.ute.ex3springboot4securitymapstructshop.entity.Category;
 import thuc.ute.ex3springboot4securitymapstructshop.entity.Product;
 import thuc.ute.ex3springboot4securitymapstructshop.entity.User;
 import thuc.ute.ex3springboot4securitymapstructshop.mapper.ProductMapper;
@@ -22,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
     private final UserRepository userRepository;
     private final ProductMapper mapper;
     private final CloudinaryService cloudinaryService;
+    private final CategoryRepository categoryRepository;
 
     @Override @Transactional(readOnly = true)
     public Page<ProductDTO> findAll(String keyword, int page, int size) {
@@ -43,8 +46,14 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO create(ProductDTO dto, MultipartFile image) {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User không tồn tại"));
+        
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Danh mục không tồn tại"));
+
         Product product = mapper.toEntity(dto);
         product.setUser(user);
+        product.setCategory(category);
+        
         if (image != null && !image.isEmpty()) {
             CloudinaryUploadResult r = cloudinaryService.upload(image);
             product.setImageUrl(r.url() + "|" + r.publicId());
@@ -56,7 +65,12 @@ public class ProductServiceImpl implements ProductService {
     public ProductDTO update(Long id, ProductDTO dto, MultipartFile image) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product không tồn tại"));
-                        product.setName(dto.getName());
+                
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Danh mục không tồn tại"));
+        product.setCategory(category);
+        
+        product.setName(dto.getName());
         product.setDescription(dto.getDescription());
         product.setPrice(dto.getPrice());
 

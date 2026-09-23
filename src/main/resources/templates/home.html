@@ -11,9 +11,12 @@
                     th:text="${userCount}">0</strong></div>
             <div class="card"><h3>Total Products</h3><strong
                     th:text="${productCount}">0</strong></div>
+            <div class="card"><h3>Total Categories</h3><strong
+                    th:text="${categoryCount}">0</strong></div>
         </div>
         <div class="quick-links">
             <a class="button" th:href="@{/products}">Quản lý Products</a>
+            <a class="button" th:href="@{/categories}">Quản lý Categories</a>
             <a class="button"
                th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
                th:href="@{/users}">Quản lý Users</a>

@@ -17,4 +17,8 @@ public class ProductDTO {
     private Long userId;
     private String username;
     private MultipartFile image;
+
+    private Long categoryId;
+
+    private String categoryName;
 }

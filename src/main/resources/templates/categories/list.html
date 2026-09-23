@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layouts/layout :: head('Quản lý Danh mục')}"></head>
+<body>
+
+<div th:replace="~{layouts/layout :: page(~{::main})}">
+    <main>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1>Quản lý Danh mục</h1>
+            <a th:href="@{/categories/create}" class="button">Thêm Danh mục</a>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success" style="margin-bottom: 20px; color: green; font-weight: bold;">
+            <p th:text="${success}"></p>
+        </div>
+
+        <div class="search-bar" style="margin-bottom: 20px;">
+            <form th:action="@{/categories}" method="get" style="display: flex; gap: 10px;">
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="Tìm kiếm danh mục..." style="flex-grow: 1; padding: 8px;">
+                <button type="submit" class="button">Tìm</button>
+            </form>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr style="border-bottom: 2px solid #ccc; text-align: left;">
+                    <th style="padding: 10px;">ID</th>
+                    <th style="padding: 10px;">Hình ảnh</th>
+                    <th style="padding: 10px;">Tên danh mục</th>
+                    <th style="padding: 10px;">Mô tả</th>
+                    <th style="padding: 10px;">Trạng thái</th>
+                    <th style="padding: 10px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="category : ${categories.content}" style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;" th:text="${category.id}"></td>
+                    <td style="padding: 10px;">
+                        <img th:if="${category.imageUrl != null and !category.imageUrl.isBlank()}"
+                             th:src="${category.imageUrl}"
+                             th:alt="${category.name}"
+                             width="80"
+                             height="60"
+                             style="object-fit: cover; border-radius: 6px;">
+                        <span th:if="${category.imageUrl == null or category.imageUrl.isBlank()}" style="color: #999;">
+                            Chưa có ảnh
+                        </span>
+                    </td>
+                    <td style="padding: 10px; font-weight: bold;" th:text="${category.name}"></td>
+                    <td style="padding: 10px;" th:text="${category.description}"></td>
+                    <td style="padding: 10px;">
+                        <span th:if="${category.enabled}" style="color: green;">Đang hoạt động</span>
+                        <span th:unless="${category.enabled}" style="color: red;">Đã khóa</span>
+                    </td>
+                    <td style="padding: 10px;">
+                        <div style="display: flex; gap: 10px;">
+                            <a th:href="@{/categories/edit/{id}(id=${category.id})}" class="button" style="padding: 5px 10px; font-size: 0.9em;">Sửa</a>
+                            <form th:action="@{/categories/delete/{id}(id=${category.id})}" method="post" style="display: inline;"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục này? Việc này có thể ảnh hưởng đến các sản phẩm.');">
+                                <button type="submit" class="button secondary" style="padding: 5px 10px; font-size: 0.9em;">Xóa</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                <tr th:if="${categories.empty}">
+                    <td colspan="6" style="text-align: center; padding: 20px;">Không tìm thấy danh mục nào.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${categories.totalPages > 1}" class="pagination" style="margin-top: 20px; display: flex; gap: 5px;">
+            <a th:each="pageNumber : ${#numbers.sequence(0, categories.totalPages - 1)}"
+               th:href="@{/categories(page=${pageNumber}, keyword=${keyword}, size=${size})}"
+               th:text="${pageNumber + 1}"
+               th:class="${pageNumber == categories.number ? 'button' : 'button secondary'}"
+               style="padding: 5px 10px;">
+            </a>
+        </div>
+    </main>
+</div>
+</body>
+</html>

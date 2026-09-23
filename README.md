@@ -3,7 +3,8 @@ Nguyễn Trọng Thức
 ## Đường dẫn truy cập
 
 Ứng dụng mặc định chạy tại:
-
+- User có quyền thêm và chỉnh sủa Product
+- Admin có quyền chỉnh sửa Category và Product và Users
 - Trang chủ: http://localhost:8080/
 - Đăng nhập: http://localhost:8080/login
 - Đăng ký: http://localhost:8080/register

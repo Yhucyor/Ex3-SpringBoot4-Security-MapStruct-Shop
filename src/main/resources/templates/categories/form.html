@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layouts/layout :: head(${mode == 'create' ? 'Thêm Danh mục' : 'Sửa Danh mục'})}"></head>
+<body>
+
+<div th:replace="~{layouts/layout :: page(~{::main})}">
+    <main>
+        <h1 th:text="${mode == 'create' ? 'Thêm Danh mục' : 'Sửa Danh mục'}"></h1>
+
+        <form th:action="${mode == 'create'}
+                            ? @{/categories/create}
+                            : @{/categories/edit/{id}(id=${categoryDTO.id})}"
+              th:object="${categoryDTO}"
+              method="post"
+              enctype="multipart/form-data">
+            
+            <input type="hidden" th:field="*{id}">
+
+            <div>
+                <label for="name">Tên danh mục</label>
+                <input id="name" type="text" th:field="*{name}">
+                <small class="error-text" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </div>
+
+            <div>
+                <label for="description">Mô tả</label>
+                <textarea id="description" th:field="*{description}" rows="5"></textarea>
+                <small class="error-text" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+            </div>
+
+            <div>
+                <label for="image">Hình ảnh danh mục</label>
+                <input id="image" type="file" name="image" accept="image/*">
+            </div>
+
+            <div th:if="${categoryDTO.imageUrl != null and !categoryDTO.imageUrl.isBlank()}">
+                <p>Ảnh hiện tại:</p>
+                <img th:src="${categoryDTO.imageUrl}" th:alt="${categoryDTO.name}" class="preview" style="max-width: 200px; display: block; margin-top: 10px;">
+            </div>
+
+            <div style="margin-top: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" th:field="*{enabled}" style="width: auto; margin: 0;">
+                    Hoạt động
+                </label>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button type="submit" class="button">Lưu</button>
+                <a th:href="@{/categories}" class="button secondary">Hủy</a>
+            </div>
+        </form>
+    </main>
+</div>
+</body>
+</html>
